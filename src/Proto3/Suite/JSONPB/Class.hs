@@ -588,11 +588,11 @@ instance A.ToJSONKey (Proto3.Suite.Types.String TS.ShortText) where
 #endif
 
 instance (A.ToJSONKey k, ToJSONPB k, ToJSONPB v) => ToJSONPB (M.Map k v) where
-  toJSONPB m opts = A.liftToJSON @(M.Map k) (`toJSONPB` opts) (A.Array . V.fromList . map (`toJSONPB` opts)) m
-  toEncodingPB m opts = A.liftToEncoding @(M.Map k) (`toEncodingPB` opts) (E.list (`toEncodingPB` opts)) m
+  toJSONPB m opts = A.liftToJSON @(M.Map k) (const False) (`toJSONPB` opts) (A.Array . V.fromList . map (`toJSONPB` opts)) m
+  toEncodingPB m opts = A.liftToEncoding @(M.Map k) (const False) (`toEncodingPB` opts) (E.list (`toEncodingPB` opts)) m
 
 instance (Ord k, A.FromJSONKey k, FromJSONPB k, FromJSONPB v) => FromJSONPB (M.Map k v) where
-  parseJSONPB = A.liftParseJSON @(M.Map k) parseJSONPB parseList
+  parseJSONPB = A.liftParseJSON @(M.Map k) Nothing parseJSONPB parseList
     where
       parseList (A.Array a) = traverse parseJSONPB (V.toList a)
       parseList v = A.typeMismatch "not a list" v
